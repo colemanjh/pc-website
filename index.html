@@ -3,6 +3,929 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JC's PC Puzzling — Luxury Custom PC Builds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&family=DM+Mono:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D09A;
+    --gold-dim: #7A6330;
+    --obsidian: #0B0C0E;
+    --dark: #111318;
+    --surface: #181B22;
+    --surface2: #1F232C;
+    --border: rgba(201,168,76,0.18);
+    --border-strong: rgba(201,168,76,0.45);
+    --text: #EAE6DC;
+    --muted: #8A8578;
+    --accent: #4F9DDE;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Outfit', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 4rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(11,12,14,0.85);
+    backdrop-filter: blur(18px);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  .nav-logo span { font-style: italic; font-weight: 400; }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.25s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8rem 2rem 5rem;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* Geometric background rings */
+  .hero-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    pointer-events: none;
+    animation: slowSpin 40s linear infinite;
+  }
+  .hero-ring:nth-child(1) { width: 600px; height: 600px; border-color: rgba(201,168,76,0.08); }
+  .hero-ring:nth-child(2) { width: 900px; height: 900px; border-color: rgba(201,168,76,0.05); animation-direction: reverse; animation-duration: 60s; }
+  .hero-ring:nth-child(3) { width: 1200px; height: 1200px; border-color: rgba(201,168,76,0.03); }
+
+  @keyframes slowSpin { to { transform: rotate(360deg); } }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-style: italic;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    max-width: 900px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 520px;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+
+  .hero-cta {
+    margin-top: 3rem;
+    display: flex;
+    gap: 1.25rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+
+  .btn-primary {
+    padding: 0.85rem 2.25rem;
+    background: var(--gold);
+    color: var(--obsidian);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.25s, transform 0.2s;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  .btn-outline {
+    padding: 0.85rem 2.25rem;
+    background: transparent;
+    color: var(--gold);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--border-strong);
+    cursor: pointer;
+    transition: border-color 0.25s, color 0.25s, transform 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold-light); transform: translateY(-2px); }
+
+  /* ── DIVIDER ── */
+  .gold-line {
+    width: 64px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 1.5rem;
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 4rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-style: italic;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--text);
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* ── ABOUT ── */
+  .about {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-portrait {
+    aspect-ratio: 3/4;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .about-portrait::before {
+    content: 'JC';
+    font-family: var(--font-display);
+    font-size: 8rem;
+    font-weight: 300;
+    color: var(--border);
+  }
+  .about-portrait::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(to top, var(--surface), transparent);
+  }
+
+  .portrait-caption {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 2;
+  }
+  .portrait-caption h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--gold);
+  }
+  .portrait-caption p {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .about-text p {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 1.25rem;
+  }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    margin-top: 2.5rem;
+    border: 1px solid var(--border);
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1.25rem 1.5rem;
+  }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+
+  /* ── RESEARCH TABLE ── */
+  .table-section { background: var(--dark); }
+  .table-wrap { max-width: 1200px; margin: 3rem auto 0; overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  thead th {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-style: italic;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border-strong);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+
+  tbody td {
+    padding: 1rem 1.25rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+  tbody td:first-child {
+    color: var(--text);
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+  tbody td.price {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .badge-gold { background: rgba(201,168,76,0.15); color: var(--gold); border: 1px solid rgba(201,168,76,0.3); }
+  .badge-blue { background: rgba(79,157,222,0.12); color: #6eb7f0; border: 1px solid rgba(79,157,222,0.25); }
+
+  .table-total {
+    margin-top: 1px;
+    background: var(--surface2);
+    border: 1px solid var(--border-strong);
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .table-total-label {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--text);
+    font-style: italic;
+  }
+  .table-total-price {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  /* ── PHILOSOPHY CARDS ── */
+  .philosophy-grid {
+    max-width: 1200px;
+    margin: 3rem auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .phil-card {
+    background: var(--surface);
+    padding: 2.5rem 2rem;
+    transition: background 0.3s;
+  }
+  .phil-card:hover { background: var(--surface2); }
+
+  .phil-number {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--border-strong);
+    line-height: 1;
+    margin-bottom: 1.25rem;
+  }
+
+  .phil-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+  .phil-title em { font-style: italic; color: var(--gold); }
+
+  .phil-desc {
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* ── PROCESS ── */
+  .process-section { background: var(--obsidian); }
+  .process-steps {
+    max-width: 1000px;
+    margin: 3rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .process-step {
+    display: grid;
+    grid-template-columns: 80px 1px 1fr;
+    gap: 0 2rem;
+    align-items: start;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--gold-dim);
+    line-height: 1;
+    text-align: right;
+  }
+
+  .step-line { background: var(--border); }
+
+  .step-content { padding-left: 1rem; }
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .step-desc {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* ── CONTACT ── */
+  .contact-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .contact-inner { max-width: 680px; margin: 0 auto; }
+  .contact-inner p {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--muted);
+    margin-top: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: var(--obsidian);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 300;
+    padding: 0.8rem 1rem;
+    outline: none;
+    transition: border-color 0.25s;
+    appearance: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { resize: vertical; min-height: 120px; }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    background: var(--obsidian);
+    z-index: 1;
+    position: relative;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--gold-dim);
+  }
+  .footer-copy {
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 2rem; }
+    section { padding: 4rem 2rem; }
+    .about { grid-template-columns: 1fr; gap: 3rem; }
+    .about-portrait { max-height: 300px; aspect-ratio: auto; }
+    .philosophy-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span>JC Computer Puzzling</span> — PC Customization & Building</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#build">The Build</a></li>
+    <li><a href="#philosophy">Philosophy</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Commission</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-ring"></div>
+  <div class="hero-ring"></div>
+  <div class="hero-ring"></div>
+
+  <p class="hero-eyebrow">Luxury Custom Computing — Est. 2019</p>
+
+  <h1 class="hero-title">
+    Crafted for <em><span style="color: var(--gold);">Quietness</span>,<br><span style="color: var(--gold);">Reliability</span></em> &amp; <span style="color: var(--gold);">Top Tier Excellence</span>
+  </h1>
+
+  <p class="hero-sub">
+    Each build is assembled by hand, with precision for long-term running performance.
+  </p>
+
+  <div class="hero-cta">
+    <a href="#build" class="btn-primary">Explore the Build</a>
+    <a href="#contact" class="btn-outline">Commission Yours</a>
+  </div>
+</header>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about">
+    <div class="about-portrait">
+      <div class="portrait-caption">
+        <h3>John Coleman</h3>
+        <p>Master Builder &amp; Founder</p>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <p class="section-label">The Craftsman</p>
+      <h2 class="section-title">Your Builder Who <em>Exceeds</em> Expectations</h2>
+      <p>JC Computer Puzzling is a PC craftsman system, we test every machine and assemble them with detailed precision, like a watchmaker or luthier who prepares a violin or a cello.</p>
+      <p>We have 7 years dedicated to high-end custom builds. Our philosophy is simple: there is no substitute for doing it right. We guarantee our builds for mechanical longevity.</p>
+      <div class="about-stats">
+        <div class="stat"> 
+          <div class="stat-num">5+</div>
+          <div class="stat-label">Builds Delivered</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">7+</div>
+          <div class="stat-label">Years Mastery</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Bench-Tested</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">0</div>
+          <div class="stat-label">DOA Deliveries</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH / BUILD TABLE -->
+<section id="build" class="table-section">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <p class="section-label reveal">JC's 2026 Flagship Specification</p>
+    <h2 class="section-title reveal"><em>Signature</em> High-End Builds</h2>
+    <p style="color: var(--muted); font-weight: 300; margin-top: 0.75rem; max-width: 580px;" class="reveal">
+      JC Computer Puzzling research, source, and curate every component before selecting them for stability, thermal performance, and acoustic silence — WITHOUT COMPROMISE.
+    </p>
+  </div>
+
+  <div class="table-wrap reveal">
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Selected Part</th>
+          <th>Key Specification</th>
+          <th>Platform</th>
+          <th>Est. Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>CPU</td>
+          <td>AMD Ryzen 9 9950X3D2 Dual Edition</td>
+          <td>16 core / 32 thread, Zen 5, AM5</td>
+          <td><span class="badge badge-gold">AMD AM5</span></td>
+          <td class="price">~$900</td>
+        </tr>
+        <tr>
+          <td>GPU</td>
+          <td>ASUS ROG Astral GeForce RTX 5090</td>
+          <td>32 GB GDDR7, PCIe 5.0, Ray Tracing</td>
+          <td><span class="badge badge-blue">ASUS</span></td>
+          <td class="price">~$4,000</td>
+        </tr>
+        <tr>
+          <td>Motherboard</td>
+          <td>ASUS ROG Strix X870E-E</td>
+          <td>DDR5, PCIe 5.0, Wi-Fi 7, USB4</td>
+          <td><span class="badge badge-gold">AMD AM5</span></td>
+          <td class="price">~$600</td>
+        </tr>
+        <tr>
+          <td>RAM</td>
+          <td>G.Skill Trident Z5 64GB</td>
+          <td>DDR5-6400 CL30, 2×32GB Dual Channel</td>
+          <td><span class="badge badge-gold">DDR5</span></td>
+          <td class="price">~$890</td>
+        </tr>
+        <tr>
+          <td>Primary SSD</td>
+          <td>Samsung 9100 Pro 4TB</td>
+          <td>PCIe 5.0 NVMe, 14,800 MB/s Read</td>
+          <td><span class="badge badge-blue">NVMe</span></td>
+          <td class="price">~$794</td>
+        </tr>
+        <tr>
+          <td>Secondary SSD</td>
+          <td>WD Black SN850X 2TB</td>
+          <td>PCIe 4.0, Game Storage Volume</td>
+          <td><span class="badge badge-blue">NVMe</span></td>
+          <td class="price">~$378</td>
+        </tr>
+        <tr>
+          <td>CPU Cooler</td>
+          <td>Arctic Liquid Freezer III 420</td>
+          <td>420mm AIO, ultra-low noise pump</td>
+          <td><span class="badge badge-gold">Silent</span></td>
+          <td class="price">~$109</td>
+        </tr>
+        <tr>
+          <td>PSU</td>
+          <td>Seasonic Prime TX-1600</td>
+          <td>1600W 80 Plus Titanium, ATX 3.1, Fully Modular</td>
+          <td><span class="badge badge-gold">ATX 3.1</span></td>
+          <td class="price">~$744</td>
+        </tr>
+        <tr>
+          <td>Case</td>
+          <td>Corsair Air 5400</td>
+          <td>E-ATX, Triple Cooling CPU, AIO and PSU Chamber, Triple Chamber Airflow, Tempered Glass panels.</td>
+          <td><span class="badge badge-gold">Luxury</span></td>
+          <td class="price">~$280</td>
+        </tr>
+        <tr>
+          <td>Case Fans</td>
+          <td>Noctua NF-A14 × 6</td>
+          <td>140mm, 24.6 dB(A) max — whisper silent</td>
+          <td><span class="badge badge-gold">Silent</span></td>
+          <td class="price">~$150</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-total">
+      <span class="table-total-label">Total Investment — Flagship Build</span>
+      <span class="table-total-price">~$8,838</span>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section id="philosophy" style="background: var(--obsidian);">
+  <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+    <p class="section-label reveal">JC's Standards</p>
+    <h2 class="section-title reveal">Three Pillars of <em>Every</em> Build</h2>
+  </div>
+  <div class="philosophy-grid reveal" style="max-width: 1200px; margin: 3rem auto 0;">
+    <div class="phil-card">
+      <div class="phil-number">01</div>
+      <h3 class="phil-title"><em>Silence</em> by Design</h3>
+      <p class="phil-desc">Acoustic engineering is not an afterthought — it is the foundation of every fan curve, cooler selection, and case choice to optimize and deliver a near perfectly crafted build.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-number">02</div>
+      <h3 class="phil-title">Long-Term <em>Stability</em></h3>
+      <p class="phil-desc">Each build undergoes a full day of stress testing. Components are matched for thermal compatibility, power delivery headroom, and signal integrity. Nothing ships until perfection is confirmed.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-number">03</div>
+      <h3 class="phil-title">Enduring <em>Excellence</em></h3>
+      <p class="phil-desc">By selecting platforms with confirmed upgrade paths — like AMD AM5 — and premium-grade components, every JC build is engineered to remain relevant and upgradeable for years beyond delivery.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="process-section">
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <p class="section-label reveal">How It Works</p>
+    <h2 class="section-title reveal">The <em>Commission</em> Process</h2>
+  </div>
+  <div class="process-steps">
+    <div class="process-step reveal">
+      <div class="step-num">01</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <h3 class="step-title">Consultation &amp; Specification</h3>
+        <p class="step-desc">We will meet with you to understand your workflow, environment, and aspirations, using tailored crafted specification for only your component specific needs.</p>
+      </div>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">02</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <h3 class="step-title">Component Sourcing &amp; Vetting</h3>
+        <p class="step-desc">Every part is sourced directly from authorized distributors. Batch numbers are verified and components are inspected before the assembly begins. No refurbished. No grey market. No exceptions.</p>
+      </div>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">03</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <h3 class="step-title">Hand Assembly &amp; Cable Artistry</h3>
+        <p class="step-desc">JC assembles every machine part personally — routing cables with precision, optimizing airflow channels, and applying premium thermal compounds. The interior is finished to gallery standard.</p>
+      </div>
+    </div>
+    <div class="process-step reveal">
+      <div class="step-num">04</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <h3 class="step-title">72-Hour Stress Testing</h3>
+        <p class="step-desc">Before packaging, every build is run a full hour per component for thermal and stability testing. The CPU, GPU, RAM, and storage are all verified under maximum load. Temperatures, frequencies, and errors are logged and reviewed.</p>
+      </div>
+    </div>
+    <div class="process-step reveal" style="border-bottom: none;">
+      <div class="step-num">05</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <h3 class="step-title">Delivery &amp; Lifetime Support</h3>
+        <p class="step-desc">Your machine is delivered with full documentation, build photos, and test logs. JC provides lifetime support for every JC Puzzling Crafted build, because a relationship with your computor should last.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact-section">
+  <div class="contact-inner">
+    <p class="section-label">Commission a Build</p>
+    <h2 class="section-title">Begin Your <em>Journey</em></h2>
+    <p>Tell me about your vision. Every commission begins with a conversation, no pressure, no upselling, just precision craftsmanship in service of your exact needs.</p>
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="budget">Approximate Budget</label>
+        <select id="budget">
+          <option value="">Select a range</option>
+          <option>$1,000 – $2,000</option>
+          <option>$2,000 – $3,500</option>
+          <option>$3,500 – $5,500</option>
+          <option>$5,500 – $8,000</option>
+          <option>$8,000+ — No ceiling</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="use">Primary Use Case</label>
+        <select id="use">
+          <option value="">Select your primary use</option>
+          <option>Creative Production (Video / 3D / Audio)</option>
+          <option>High-Performance Gaming</option>
+          <option>Software Engineering / Development</option>
+          <option>AI / Machine Learning Workloads</option>
+          <option>Workstation / Professional General Use</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="message">Your Vision</label>
+        <textarea id="message" placeholder="Describe your ideal machine — any preferences for silence, aesthetics, upgrade needs, or specific requirements..."></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="align-self: center; margin-top: 0.5rem;">
+        Send Commission Request
+      </button>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">JC Computer Puzzling</div>
+  <div class="footer-copy">&copy; 2026 JC Puzzling — All builds are handcrafted in the USA</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Smooth form submit
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.textContent = 'Request Sent — JC Will Be In Touch';
+    btn.style.background = 'var(--gold-dim)';
+    btn.disabled = true;
+  }
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, vinitial-scale=1.0">
 <title>JC's PC Puzzling — Luxury Custom PC Builds</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
